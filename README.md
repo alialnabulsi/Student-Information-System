@@ -1,161 +1,99 @@
-# Student Information System (SIS)
+# Student Information System — Legacy Prototype
 
-![License](https://img.shields.io/badge/license-ISC-blue.svg)
+An educational Student Information System (SIS) prototype built with Node.js, Express, EJS, and MariaDB. It demonstrates modular controllers, services, repositories, validation, and academic resource management.
 
-A comprehensive **Student Information System (SIS)** designed to manage students, courses, enrollments, schedules, and more. Built with **Node.js**, **Express**, and **MySQL**, this system provides a robust backend API for handling all aspects of student and academic management.
+> **Legacy project / not production-ready.** This is the original academic CRUD prototype, separate from the actively maintained [SIS-API](https://github.com/alialnabulsi/SIS-API). Do not deploy it publicly or connect it to real university data. Authentication, authorization, and password handling require security remediation.
 
----
+## Tech Stack
 
-## Table of Contents
-1. [Features](#features)
-2. [Technologies Used](#technologies-used)
-3. [Installation](#installation)
-4. [Configuration](#configuration)
-5. [API Endpoints](#api-endpoints)
-6. [Usage](#usage)
-7. [Contributing](#contributing)
-8. [License](#license)
-9. [Contact](#contact)
+| Technology | Purpose |
+| --- | --- |
+| Node.js / JavaScript | Application runtime (CommonJS) |
+| Express 4 | HTTP routes and middleware |
+| MariaDB | Relational database through the `mariadb` driver |
+| EJS | Server-rendered dashboard pages |
+| express-validator | Request validation |
+| bcrypt (dependency) | Password-hashing library; correct end-to-end use is not assured by this prototype |
 
----
+The code uses repository-level SQL queries rather than a fully integrated Sequelize ORM.
 
-## Features
-- **Student Management**: Add, update, delete, and view student details.
-- **Course Management**: Manage courses, prerequisites, and programs.
-- **Enrollment System**: Handle student enrollments and grades.
-- **Schedule Management**: Manage class schedules, rooms, and final exams.
-- **User Roles**: Admin, Advisor, Instructor, and Student roles with specific permissions.
-- **Database Integration**: MySQL database for storing all data.
-- **RESTful API**: Fully documented API endpoints for seamless integration.
+## Project Structure
 
----
-
-## Technologies Used
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL (with Sequelize ORM)
-- **Validation**: Express Validator
-- **Environment Management**: Dotenv
-- **API Testing**: Postman 
-- **Version Control**: Git
-
----
-
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/alialnabulsi/SIS-Project.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd SIS-Project
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Set up the database:
-   - Import the SQL file provided in the database folder.
-   - Update the database configuration in `.env`.
-
----
-
-## Configuration
-Create a `.env` file in the root directory and add the following environment variables:
-
-```env
-DB_HOST=your-database-host
-DB_USER=your-database-user
-DB_PASSWORD=your-database-password
-DB_NAME=your-database-name
-PORT=5000
+```text
+Student-Information-System/
+├── index.js          # Express setup and route mounting
+├── config/           # MariaDB connection pool
+├── routes/           # Academic and user resource routes
+├── controllers/      # HTTP request handlers
+├── services/         # Service-layer operations
+├── repositories/     # Database queries
+├── models/           # Data representations
+├── validators/       # Input validators
+├── middleware/       # Experimental security utilities
+├── views/            # EJS dashboards
+└── public/           # Static browser assets
 ```
 
----
+## API Overview
 
-## API Endpoints
+The application mounts resource routers under `/api/sis`. The table below reflects route prefixes in `index.js`; individual supported methods vary by router.
 
-### Students
-- `GET /api/students` - Get all students.
-- `POST /api/students` - Create a new student.
-- `GET /api/students/:studentID` - Get a specific student by ID.
-- `PUT /api/students/:studentID` - Update a student by ID.
-- `DELETE /api/students/:studentID` - Delete a student by ID.
+| Resource group | Base path |
+| --- | --- |
+| Users | `/api/sis/user` |
+| Students | `/api/sis/student` |
+| Instructors and advisors | `/api/sis/instructor`, `/api/sis/advisor` |
+| Roles and administration | `/api/sis/role`, `/api/sis/user-role`, `/api/sis/admin` |
+| Academic organization | `/api/sis/campus`, `/api/sis/faculty`, `/api/sis/department` |
+| Programs and subjects | `/api/sis/program`, `/api/sis/course`, `/api/sis/course-program`, `/api/sis/major`, `/api/sis/minor`, `/api/sis/prerequisite` |
+| Scheduling and enrollment | `/api/sis/semester`, `/api/sis/section`, `/api/sis/schedule`, `/api/sis/enrollment` |
+| Facilities | `/api/sis/building`, `/api/sis/location`, `/api/sis/room` |
+| Exams and academic holds | `/api/sis/final-exam`, `/api/sis/final-exam-schedule`, `/api/sis/hold`, `/api/sis/student-hold` |
+| Contact information | `/api/sis/phone-number` |
 
-### Courses
-- `GET /api/courses` - Get all courses.
-- `POST /api/courses` - Create a new course.
-- `GET /api/courses/:courseID` - Get a specific course by ID.
-- `PUT /api/courses/:courseID` - Update a course by ID.
-- `DELETE /api/courses/:courseID` - Delete a course by ID.
+Examples of routes defined by the source code:
 
-### Enrollments
-- `GET /api/enrollments` - Get all enrollments.
-- `POST /api/enrollments` - Create a new enrollment.
-- `GET /api/enrollments/:enrollmentID` - Get a specific enrollment by ID.
-- `PUT /api/enrollments/:enrollmentID` - Update an enrollment by ID.
-- `DELETE /api/enrollments/:enrollmentID` - Delete an enrollment by ID.
+```http
+GET /api/sis/user
+GET /api/sis/user/id/:userID
+POST /api/sis/user
+GET /api/sis/course
+GET /api/sis/course/:courseID
+```
 
-### Schedules
-- `GET /api/schedules` - Get all schedules.
-- `POST /api/schedules` - Create a new schedule.
-- `GET /api/schedules/:scheduleID` - Get a specific schedule by ID.
-- `PUT /api/schedules/:scheduleID` - Update a schedule by ID.
-- `DELETE /api/schedules/:scheduleID` - Delete a schedule by ID.
+These are **code-reference examples only**. They should not be interpreted as safe-to-expose public endpoints.
 
-### Users
-- `GET /api/users` - Get all users.
-- `POST /api/users` - Create a new user.
-- `GET /api/users/:userID` - Get a specific user by ID.
-- `PUT /api/users/:userID` - Update a user by ID.
-- `DELETE /api/users/:userID` - Delete a user by ID.
+## Local Development
 
----
+**Prerequisite:** A MariaDB database matching the models/repositories. A complete database initialization migration is **not included** in this repository, so cloning it alone is not sufficient to run every endpoint.
 
-## Usage
-1. Start the server:
+1. Install Node.js and a compatible MariaDB server.
+2. Clone the repository and install packages:
    ```bash
-   npm start
+   git clone https://github.com/alialnabulsi/Student-Information-System.git
+   cd Student-Information-System
+   npm install
    ```
-2. For development, use:
+3. Create a local `.env` with these variables:
+   ```env
+   DB_HOST=127.0.0.1
+   DB_USER=your_local_user
+   DB_PASS=your_local_password
+   DB_NAME=your_local_database
+   PORT=5000
+   ```
+4. Provide a compatible **nonproduction** database schema, then start:
    ```bash
    npm run dev
    ```
-3. Use an API testing tool like Postman or Insomnia to interact with the endpoints.
-4. Refer to the API Endpoints section for available routes.
 
----
+The root page serves an EJS view at `http://localhost:5000/`. This repository's `npm test` script is a placeholder, not a test suite.
 
-## Contributing
-Contributions are welcome! Please follow these steps:
+## Known Limitations and Security
 
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add your feature"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request.
+- Current route wiring does not enforce authenticated or role-authorized access to administrative and destructive operations.
+- User password comparison in the legacy model uses direct string equality; do not rely on it to protect credentials.
+- The repository does not include a reproducible database schema migration.
+- Some legacy naming, dependencies, and error handling still need review.
 
----
-
-## License
-This project is licensed under the ISC License. See the `LICENSE` file for details.
-
----
-
-## Contact
-For questions or feedback, feel free to reach out:
-
-- **Author**: Ali Al Nabulsi  
-- **GitHub**: [alialnabulsi](https://github.com/alialnabulsi)  
-- **Email**: ali.alnabulsi@std.balamand.edu.lb  
-
----
-
+**Use [SIS-API](https://github.com/alialnabulsi/SIS-API) for the Balamandian integration.** The two repositories have different architectures and security models.
